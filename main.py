@@ -4,6 +4,7 @@ import socket
 import smtplib
 import requests
 import time
+import signal
 from datetime import datetime
 from email.message import EmailMessage
 from dotenv import load_dotenv
@@ -11,6 +12,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 previous_state = None
+running = True
+
+def handle_shutdown(signum, frame):
+    global running
+    running = False
+
+signal.signal(signal.SIGTERM, handle_shutdown)
+signal.signal(signal.SIGINT, handle_shutdown)
 
 DOMAIN = os.getenv("DOMAIN", "")
 URL = os.getenv("URL", "")
@@ -24,6 +33,7 @@ SMTP_FROM = os.getenv("SMTP_FROM")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 SEND_TO = os.getenv("SEND_TO") or SMTP_FROM
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[DownDetector]")
+
 
 def format_local_timestamp(timestamp) -> str:
     try:
@@ -175,7 +185,7 @@ def main():
 
     previous_state = load_state()
 
-    while True:
+    while running:
         current_state = get_current_state()
         current_state["last_changed"] = compute_last_changed(previous_state, current_state)
 
@@ -191,7 +201,11 @@ def main():
 
         save_state(current_state)
         previous_state = current_state
-        time.sleep(CHECK_INTERVAL)
+        
+        remaining = CHECK_INTERVAL
+        while running and remaining > 0:
+            time.sleep(min(1, remaining))
+            remaining -= 1
 
 
 if __name__ == "__main__":
