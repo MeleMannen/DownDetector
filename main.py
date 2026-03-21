@@ -106,10 +106,16 @@ def get_current_state():
 def state_changed(old_state, new_state) -> bool:
     if old_state is None:
         return False
-    return old_state.get("status") != new_state.get("status")
+    if old_state.get("status") != new_state.get("status"):
+        return True
+    if old_state.get("http_status") != new_state.get("http_status"):
+        return True
+    if old_state.get("ip") != new_state.get("ip"):
+        return True
+    return False
 
 
-def notify_change(old_state, new_state):
+def print_changes(old_state, new_state):
     print("STATE CHANGE DETECTED")
     print(f"Old: {old_state.get('status')}")
     print(f"New: {new_state.get('status')}")
@@ -119,10 +125,10 @@ def notify_change(old_state, new_state):
     print(json.dumps(new_state, indent=2))
 
 
-def send_email_notification(old_state, new_state):
+def send_email(old_state, new_state):
     if not SMTP_HOST or not SMTP_PORT or not SMTP_FROM or not SMTP_PASSWORD or not SEND_TO:
         print(
-            "Email notification skipped: missing SMTP_HOST, SMTP_PORT, "
+            "Email skipped: missing SMTP_HOST, SMTP_PORT, "
             "SMTP_FROM, SMTP_PASSWORD, or SEND_TO"
         )
         return
@@ -165,9 +171,9 @@ def send_email_notification(old_state, new_state):
             smtp.login(SMTP_FROM, SMTP_PASSWORD)
             smtp.send_message(msg)
 
-        print(f"Email notification sent to {SEND_TO}")
+        print(f"Email sent to {SEND_TO}")
     except Exception as e:
-        print(f"Failed to send email notification: {e}")
+        print(f"Failed to send email: {e}")
 
 
 def compute_last_changed(old_state, new_state) -> int:
@@ -193,8 +199,8 @@ def main():
             print(f"Initial state: {current_state['status']} checked_at={format_local_timestamp(current_state['checked_at'])}")
 
         elif state_changed(previous_state, current_state):
-            notify_change(previous_state, current_state)
-            send_email_notification(previous_state, current_state)
+            print_changes(previous_state, current_state)
+            send_email(previous_state, current_state)
 
         else:
             print(f"No change: status={current_state['status']} dns_ok={current_state['dns_ok']} http_status={current_state['http_status']} last_changed={format_local_timestamp(current_state['last_changed'])} checked_at={format_local_timestamp(current_state['checked_at'])}")
