@@ -197,6 +197,11 @@ def main():
 
         if previous_state is None:
             print(f"Initial state: {current_state['status']} checked_at={format_local_timestamp(current_state['checked_at'])}")
+            if current_state["status"] == "down":
+                fresh_state = current_state.copy()
+                fresh_state["status"] = "unknown"
+                print_changes(fresh_state, current_state)
+                send_email(fresh_state, current_state)
 
         elif state_changed(previous_state, current_state):
             print_changes(previous_state, current_state)
