@@ -54,7 +54,7 @@ SMTP_PORT=465
 SMTP_USE_SSL=true
 SMTP_FROM=you@gmail.com
 SMTP_PASSWORD=your_app_password
-SEND_TO=you@gmail.com
+SMTP_TO=you@gmail.com
 EMAIL_SUBJECT_PREFIX=[DownDetector]
 ```
 
@@ -74,7 +74,7 @@ services:
       SMTP_USE_SSL: "true"
       SMTP_FROM: you@gmail.com
       SMTP_PASSWORD: your_app_password
-      SEND_TO: you@gmail.com
+      SMTP_TO: you@gmail.com
       EMAIL_SUBJECT_PREFIX: "[DownDetector]"
     volumes:
       - ./data:/app/data

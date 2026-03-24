@@ -31,7 +31,7 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
 SMTP_USE_SSL = os.getenv("SMTP_USE_SSL", "true").lower() in ("1", "true", "yes", "on")
 SMTP_FROM = os.getenv("SMTP_FROM")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
-SEND_TO = os.getenv("SEND_TO") or SMTP_FROM
+SMTP_TO = os.getenv("SMTP_TO") or SMTP_FROM
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[DownDetector]")
 
 
@@ -126,16 +126,16 @@ def print_changes(old_state, new_state):
 
 
 def send_email(old_state, new_state):
-    if not SMTP_HOST or not SMTP_PORT or not SMTP_FROM or not SMTP_PASSWORD or not SEND_TO:
+    if not SMTP_HOST or not SMTP_PORT or not SMTP_FROM or not SMTP_PASSWORD or not SMTP_TO:
         print(
             "Email skipped: missing SMTP_HOST, SMTP_PORT, "
-            "SMTP_FROM, SMTP_PASSWORD, or SEND_TO"
+            "SMTP_FROM, SMTP_PASSWORD, or SMTP_TO"
         )
         return
 
     msg = EmailMessage()
     msg["From"] = SMTP_FROM
-    msg["To"] = SEND_TO
+    msg["To"] = SMTP_TO
     msg["Subject"] = (
         f"{EMAIL_SUBJECT_PREFIX} {new_state.get('domain')} is {new_state.get('status')}"
     )
@@ -171,7 +171,7 @@ def send_email(old_state, new_state):
             smtp.login(SMTP_FROM, SMTP_PASSWORD)
             smtp.send_message(msg)
 
-        print(f"Email sent to {SEND_TO}")
+        print(f"Email sent to {SMTP_TO}")
     except Exception as e:
         print(f"Failed to send email: {e}")
 
