@@ -76,6 +76,7 @@ services:
       SMTP_PASSWORD: your_app_password
       SMTP_TO: you@gmail.com
       EMAIL_SUBJECT_PREFIX: "[DownDetector]"
+      TZ: "Europe/Oslo"
     volumes:
       - ./data:/app/data
 ```
