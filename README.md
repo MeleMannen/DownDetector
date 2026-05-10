@@ -38,6 +38,7 @@ You can set variables in a `.env` file (local run), or in Docker Compose YAML un
 | SMTP_PASSWORD | Yes (for email) | empty | SMTP password |
 | SMTP_TO | No | SMTP_FROM | Recipient email address |
 | EMAIL_SUBJECT_PREFIX | No | [DownDetector] | Prefix used in email subject |
+| SHOULD_CHECK_IP_CHANGE | No | false | Checks if IP has changed |
 
 If required email variables are missing, the monitor still runs but skips email notifications.
 
@@ -56,6 +57,7 @@ SMTP_FROM=you@gmail.com
 SMTP_PASSWORD=your_app_password
 SMTP_TO=you@gmail.com
 EMAIL_SUBJECT_PREFIX=[DownDetector]
+SHOULD_CHECK_IP_CHANGE=true
 ```
 
 ## Example: Docker Compose YAML
@@ -76,6 +78,7 @@ services:
       SMTP_PASSWORD: your_app_password
       SMTP_TO: you@gmail.com
       EMAIL_SUBJECT_PREFIX: "[DownDetector]"
+      SHOULD_CHECK_IP_CHANGE: "true"
       TZ: "Europe/Oslo"
     volumes:
       - ./data:/app/data
