@@ -33,6 +33,7 @@ SMTP_FROM = os.getenv("SMTP_FROM")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 SMTP_TO = os.getenv("SMTP_TO") or SMTP_FROM
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[DownDetector]")
+SHOULD_CHECK_IP_CHANGE = os.getenv("SHOULD_CHECK_IP_CHANGE", "true").lower() in ("1", "true", "yes", "on")
 
 
 def format_local_timestamp(timestamp) -> str:
@@ -110,7 +111,7 @@ def state_changed(old_state, new_state) -> bool:
         return True
     if old_state.get("http_status") != new_state.get("http_status"):
         return True
-    if old_state.get("ip") != new_state.get("ip"):
+    if SHOULD_CHECK_IP_CHANGE and old_state.get("ip") != new_state.get("ip"):
         return True
     return False
 
